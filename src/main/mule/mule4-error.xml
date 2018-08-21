@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="1ad06234-d02a-43ab-8d09-a82e3052a8de" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config1" doc:name="Database Config" doc:id="def61aa8-61bb-49f2-a982-acc8866b491f" >
+		<db:my-sql-connection host="localhost" port="4083" />
+	</db:config>
+	<flow name="mule4-errorFlow2" doc:id="7f07140c-0072-43fe-be30-548f2644366b" >
+		<http:listener doc:name="Listener" doc:id="14efb751-1151-4a43-8d5b-8deb4b268e00" config-ref="HTTP_Listener_config" path="/error"/>
+		<db:select doc:name="Select" doc:id="fef8f82f-1e6d-4db5-b9ab-6b3d47a5624b" config-ref="Database_Config1">
+			<error-mapping targetType="MY_APP:UNDERLYING_SYS_UNAVAILABLE" />
+			<db:sql >select * from pets</db:sql>
+		</db:select>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e25b288d-8410-4e64-a37d-ddd72ec7cb5e" >
+				<logger level="INFO" doc:name="Logger" doc:id="25058d26-b7c4-4837-b712-8e3516018942" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

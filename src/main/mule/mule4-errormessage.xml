@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="7bbb8267-aa84-40f8-a071-338c0ee3e5e2" >
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
+	<flow name="mule4-errormessageFlow1" doc:id="dd0e8464-cb3e-4966-9ac3-fbe24c735e94" >
+		<http:listener doc:name="Listener" doc:id="0169a18a-e7e4-48e3-9f87-f35b38c7a159" config-ref="HTTP_Listener_config" path="/rate-limited">
+			<http:response statusCode="400" />
+		</http:listener>
+		<set-payload value='{"msBackoff":1000}' doc:name="Set Payload" doc:id="d09e06b1-ce63-44f5-b79a-938a05468841" mimeType="application/json"/>
+	</flow>
+	<flow name="mule4-errormessageFlow" doc:id="3df324d7-dae9-463b-bfd9-afd8e2bec8b9" >
+		<http:listener doc:name="Listener" doc:id="f118908f-c334-4b8f-b49c-4fee6c52fb78" config-ref="HTTP_Listener_config" path="/error-message"/>
+		<http:request method="GET" doc:name="Request" doc:id="8fffad66-7b6f-42d1-8ed8-9f75ddb37139" config-ref="HTTP_Request_configuration" path="/rate-limited"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2a91fdab-9172-46ed-a800-52e08af6fc5b" >
+				<logger level="INFO" doc:name="Logger" doc:id="db4b71d2-7f9f-4e56-b378-e7ca56494e47" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>
